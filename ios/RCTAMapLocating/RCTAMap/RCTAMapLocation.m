@@ -73,7 +73,7 @@ static NSDictionary<NSString *, id> *KKRCTPositionError(KKRCTPositionErrorCode c
              };
 }
 
-@interface KKLocationRequest : NSObject
+@interface KKALocationRequest : NSObject
 
 @property (nonatomic, copy) RCTResponseSenderBlock successBlock;
 @property (nonatomic, copy) RCTResponseSenderBlock errorBlock;
@@ -82,7 +82,7 @@ static NSDictionary<NSString *, id> *KKRCTPositionError(KKRCTPositionErrorCode c
 
 @end
 
-@implementation KKLocationRequest
+@implementation KKALocationRequest
 
 - (void)dealloc
 {
@@ -102,7 +102,7 @@ static NSDictionary<NSString *, id> *KKRCTPositionError(KKRCTPositionErrorCode c
     AMapLocationManager *_locationManager;
     NSDictionary<NSString *, id> *_lastLocationEvent;
     BOOL _observingLocation;
-    NSMutableArray<KKLocationRequest *> *_pendingRequests;
+    NSMutableArray<KKALocationRequest *> *_pendingRequests;
     KKLocationOptions _observerOptions;
 }
 
@@ -140,7 +140,7 @@ RCT_EXPORT_MODULE(YYAMapLocationObserver);
 
 - (void)timeout:(NSTimer *)timer
 {
-    KKLocationRequest *request = timer.userInfo;
+    KKALocationRequest *request = timer.userInfo;
     NSString *message = [NSString stringWithFormat: @"Unable to fetch location within %zds.", (NSInteger)(timer.timeInterval * 1000.0)];
     request.errorBlock(@[KKRCTPositionError(KKRCTPositionErrorTimeout, message)]);
     [_pendingRequests removeObject:request];
@@ -159,7 +159,7 @@ RCT_EXPORT_METHOD(startObserving:(KKLocationOptions)options)
     
     // Select best options
     _observerOptions = options;
-    for (KKLocationRequest *request in _pendingRequests) {
+    for (KKALocationRequest *request in _pendingRequests) {
         _observerOptions.accuracy = MIN(_observerOptions.accuracy, request.options.accuracy);
     }
     
@@ -218,7 +218,7 @@ RCT_EXPORT_METHOD(getCurrentPosition:(KKLocationOptions)options
     }
     
     // Create request
-    KKLocationRequest *request = [KKLocationRequest new];
+    KKALocationRequest *request = [KKALocationRequest new];
     request.successBlock = successBlock;
     request.errorBlock = errorBlock ?: ^(NSArray *args){};
     request.options = options;
@@ -268,7 +268,7 @@ RCT_EXPORT_METHOD(getCurrentPosition:(KKLocationOptions)options
     }
     
     // Fire all queued callbacks
-    for (KKLocationRequest *request in _pendingRequests) {
+    for (KKALocationRequest *request in _pendingRequests) {
         request.successBlock(@[_lastLocationEvent]);
         [request.timeoutTimer invalidate];
     }
@@ -311,7 +311,7 @@ RCT_EXPORT_METHOD(getCurrentPosition:(KKLocationOptions)options
     }
     
     // Fire all queued error callbacks
-    for (KKLocationRequest *request in _pendingRequests) {
+    for (KKALocationRequest *request in _pendingRequests) {
         request.errorBlock(@[jsError]);
         [request.timeoutTimer invalidate];
     }
