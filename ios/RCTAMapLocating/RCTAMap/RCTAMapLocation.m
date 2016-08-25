@@ -25,6 +25,8 @@ typedef struct {
     double maximumAge;
     double accuracy;
     double distanceFilter;
+    BOOL pausesLocationUpdatesAutomatically;
+    BOOL allowsBackgroundLocationUpdates;
 } KKLocationOptions;
 
 #define KK_DEFAULT_LOCATION_ACCURACY kCLLocationAccuracyHundredMeters
@@ -38,11 +40,19 @@ typedef struct {
     double distanceFilter = options[@"distanceFilter"] == NULL ? KK_DEFAULT_LOCATION_ACCURACY
     : [RCTConvert double:options[@"distanceFilter"]] ?: kCLDistanceFilterNone;
     
+    BOOL pausesLocationUpdatesAutomatically = options[@"pausesLocationUpdatesAutomatically"] == NULL ? NO
+    : [RCTConvert BOOL:options[@"pausesLocationUpdatesAutomatically"]] ?: NO;
+    
+    BOOL allowsBackgroundLocationUpdates = options[@"allowsBackgroundLocationUpdates"] == NULL ? NO
+    : [RCTConvert BOOL:options[@"allowsBackgroundLocationUpdates"]] ?: NO;
+    
     return (KKLocationOptions){
         .timeout = [RCTConvert NSTimeInterval:options[@"timeout"]] ?: INFINITY,
         .maximumAge = [RCTConvert NSTimeInterval:options[@"maximumAge"]] ?: INFINITY,
         .accuracy = [RCTConvert BOOL:options[@"enableHighAccuracy"]] ? kCLLocationAccuracyBest : KK_DEFAULT_LOCATION_ACCURACY,
-        .distanceFilter = distanceFilter
+        .distanceFilter = distanceFilter,
+        .pausesLocationUpdatesAutomatically = pausesLocationUpdatesAutomatically,
+        .allowsBackgroundLocationUpdates = allowsBackgroundLocationUpdates
     };
 }
 
@@ -129,6 +139,8 @@ RCT_EXPORT_MODULE(YYAMapLocationObserver);
     if (!_locationManager) {
         _locationManager = [AMapLocationManager new];
         _locationManager.distanceFilter = _observerOptions.distanceFilter;
+        _locationManager.pausesLocationUpdatesAutomatically = _observerOptions.pausesLocationUpdatesAutomatically;
+        _locationManager.allowsBackgroundLocationUpdates = _observerOptions.allowsBackgroundLocationUpdates;
         _locationManager.delegate = self;
     }
     
