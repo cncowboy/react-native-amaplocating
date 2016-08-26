@@ -108,7 +108,7 @@ var YYAMapLocation = {
 
   stopObserving: function() {
     if (updatesEnabled) {
-      RCTLocationObserver.stopObserving();
+      YYAMapLocationObserver.stopObserving();
       updatesEnabled = false;
       for (var ii = 0; ii < subscriptions.length; ii++) {
         var sub = subscriptions[ii];
